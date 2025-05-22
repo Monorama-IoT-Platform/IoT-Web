@@ -1,12 +1,11 @@
-import React from 'react';
-import AppRouter from './routes/AppRouter';
+import AppRouter from './routes/AppRouter'
 
 function App() {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-100 flex items-center justify-center">
       <AppRouter />
     </div>
-  );
+  )
 }
 
-export default App;
+export default App
