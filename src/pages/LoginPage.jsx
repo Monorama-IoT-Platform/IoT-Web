@@ -4,7 +4,7 @@ import monoramaLogo from '../assets/monorama.png'
 
 function LoginPage() {
   return (
-    <div className="min-h-screen flex justify-center items-center bg-gray-100 px-4">
+    <div className="min-h-screen flex justify-center items-center bg-neutral-200 px-4">
       <div className="bg-white rounded-2xl shadow-md px-8 py-10 flex flex-col md:flex-row items-center gap-10 max-w-4xl w-full">
         {/* 왼쪽 로고 */}
         <div className="flex flex-col items-center">
