@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { saveToken } from '../utils/tokenStorage';
-import axiosInstance from '../api/axiosInstance';
+import { saveToken } from '../../utils/tokenStorage';
+import axiosInstance from '../../api/axiosInstance';
 
 function ProjectListPage() {
   const [projects, setProjects] = useState([]);
@@ -14,9 +14,6 @@ function ProjectListPage() {
       saveToken(accessToken);
       window.history.replaceState(null, '', '/projects');
     }
-  }, []);
-
-  useEffect(() => {
     const fetchProjects = async () => {
       try {
         const res = await axiosInstance.get('/pm/projects');
