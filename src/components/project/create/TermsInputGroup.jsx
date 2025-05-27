@@ -1,38 +1,81 @@
-import React from 'react';
-
 function TermsInputGroup({
   termsOfPolicy, setTermsOfPolicy,
   privacyPolicy, setPrivacyPolicy,
   healthDataConsent, setHealthDataConsent,
   airDataConsent, setAirDataConsent,
   localDataTermsOfService, setLocalDataTermsOfService,
-  showHealth, showAir
+  showHealth, showAir,
+  errors
 }) {
+  const inputStyle = (errorKey) =>
+    `w-full border-2 rounded-lg px-4 py-2 focus:outline-none transition min-h-[70px] bg-white shadow-sm ${
+      errors?.[errorKey]
+        ? 'border-red-400 focus:ring-2 focus:ring-red-300'
+        : 'border-indigo-200 focus:ring-2 focus:ring-indigo-400'
+    }`;
+
+  const errorText = (key) =>
+    errors?.[key] && <p className="text-sm text-red-500 mt-1">{errors[key]}</p>;
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       <div className="flex flex-col gap-1">
         <label className="font-semibold text-indigo-700 mb-1">Terms of Service</label>
-        <textarea className="w-full border-2 border-indigo-200 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 transition min-h-[70px] bg-white shadow-sm" placeholder="Terms of Service" value={termsOfPolicy} onChange={e => setTermsOfPolicy(e.target.value)} />
+        <textarea
+          className={inputStyle('termsOfPolicy')}
+          placeholder="Terms of Service"
+          value={termsOfPolicy}
+          onChange={(e) => setTermsOfPolicy(e.target.value)}
+        />
+        {errorText('termsOfPolicy')}
       </div>
+
       <div className="flex flex-col gap-1">
         <label className="font-semibold text-indigo-700 mb-1">Privacy Policy</label>
-        <textarea className="w-full border-2 border-indigo-200 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 transition min-h-[70px] bg-white shadow-sm" placeholder="Privacy Policy" value={privacyPolicy} onChange={e => setPrivacyPolicy(e.target.value)} />
+        <textarea
+          className={inputStyle('privacyPolicy')}
+          placeholder="Privacy Policy"
+          value={privacyPolicy}
+          onChange={(e) => setPrivacyPolicy(e.target.value)}
+        />
+        {errorText('privacyPolicy')}
       </div>
+
       {showHealth && (
         <div className="flex flex-col gap-1">
           <label className="font-semibold text-indigo-700 mb-1">Health Data Consent</label>
-          <textarea className="w-full border-2 border-indigo-200 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 transition min-h-[70px] bg-white shadow-sm" placeholder="Health Data Consent" value={healthDataConsent} onChange={e => setHealthDataConsent(e.target.value)} />
+          <textarea
+            className={inputStyle('healthDataConsent')}
+            placeholder="Health Data Consent"
+            value={healthDataConsent}
+            onChange={(e) => setHealthDataConsent(e.target.value)}
+          />
+          {errorText('healthDataConsent')}
         </div>
       )}
+
       {showAir && (
         <div className="flex flex-col gap-1">
           <label className="font-semibold text-indigo-700 mb-1">Air Data Consent</label>
-          <textarea className="w-full border-2 border-indigo-200 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 transition min-h-[70px] bg-white shadow-sm" placeholder="Air Data Consent" value={airDataConsent} onChange={e => setAirDataConsent(e.target.value)} />
+          <textarea
+            className={inputStyle('airDataConsent')}
+            placeholder="Air Data Consent"
+            value={airDataConsent}
+            onChange={(e) => setAirDataConsent(e.target.value)}
+          />
+          {errorText('airDataConsent')}
         </div>
       )}
+
       <div className="flex flex-col gap-1 md:col-span-2">
         <label className="font-semibold text-indigo-700 mb-1">Location Data Terms of Service</label>
-        <textarea className="w-full border-2 border-indigo-200 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 transition min-h-[70px] bg-white shadow-sm" placeholder="Location Data Terms of Service" value={localDataTermsOfService} onChange={e => setLocalDataTermsOfService(e.target.value)} />
+        <textarea
+          className={inputStyle('localDataTermsOfService')}
+          placeholder="Location Data Terms of Service"
+          value={localDataTermsOfService}
+          onChange={(e) => setLocalDataTermsOfService(e.target.value)}
+        />
+        {errorText('localDataTermsOfService')}
       </div>
     </div>
   );
