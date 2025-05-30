@@ -5,17 +5,20 @@ function TermsInputGroup({
   airDataConsent, setAirDataConsent,
   localDataTermsOfService, setLocalDataTermsOfService,
   showHealth, showAir,
-  errors
+  errors,
+  readOnly = false
 }) {
   const inputStyle = (errorKey) =>
-    `w-full border-2 rounded-lg px-4 py-2 focus:outline-none transition min-h-[70px] bg-white shadow-sm ${
-      errors?.[errorKey]
+    `w-full border-2 rounded-lg px-4 py-2 transition min-h-[70px] shadow-sm ${
+      readOnly
+        ? 'bg-gray-100 border-gray-200'
+        : errors?.[errorKey]
         ? 'border-red-400 focus:ring-2 focus:ring-red-300'
         : 'border-indigo-200 focus:ring-2 focus:ring-indigo-400'
     }`;
 
   const errorText = (key) =>
-    errors?.[key] && <p className="text-sm text-red-500 mt-1">{errors[key]}</p>;
+    !readOnly && errors?.[key] && <p className="text-sm text-red-500 mt-1">{errors[key]}</p>;
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -26,6 +29,7 @@ function TermsInputGroup({
           placeholder="Terms of Service"
           value={termsOfPolicy}
           onChange={(e) => setTermsOfPolicy(e.target.value)}
+          readOnly={readOnly}
         />
         {errorText('termsOfPolicy')}
       </div>
@@ -37,6 +41,7 @@ function TermsInputGroup({
           placeholder="Privacy Policy"
           value={privacyPolicy}
           onChange={(e) => setPrivacyPolicy(e.target.value)}
+          readOnly={readOnly}
         />
         {errorText('privacyPolicy')}
       </div>
@@ -49,6 +54,7 @@ function TermsInputGroup({
             placeholder="Health Data Consent"
             value={healthDataConsent}
             onChange={(e) => setHealthDataConsent(e.target.value)}
+            readOnly={readOnly}
           />
           {errorText('healthDataConsent')}
         </div>
@@ -62,6 +68,7 @@ function TermsInputGroup({
             placeholder="Air Data Consent"
             value={airDataConsent}
             onChange={(e) => setAirDataConsent(e.target.value)}
+            readOnly={readOnly}
           />
           {errorText('airDataConsent')}
         </div>
@@ -74,6 +81,7 @@ function TermsInputGroup({
           placeholder="Location Data Terms of Service"
           value={localDataTermsOfService}
           onChange={(e) => setLocalDataTermsOfService(e.target.value)}
+          readOnly={readOnly}
         />
         {errorText('localDataTermsOfService')}
       </div>
