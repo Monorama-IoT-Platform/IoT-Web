@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { saveToken } from '../../utils/tokenStorage';
 import axiosInstance from '../../api/axiosInstance';
+import LogoutButton from '../../components/LogoutButton';
 
 function ProjectListPage() {
   const [projects, setProjects] = useState([]);
@@ -45,8 +46,11 @@ function ProjectListPage() {
   };
 
   return (
-    <div className="min-h-screen flex justify-center items-center bg-neutral-200 px-4">
-      <div className="bg-white rounded-2xl shadow-md p-8 w-full max-w-5xl">
+    <div className="relative min-h-screen bg-neutral-200 px-4 py-6">
+      {/* 오른쪽 상단 고정 로그아웃 버튼 */}
+      <LogoutButton />
+
+      <div className="bg-white rounded-2xl shadow-md p-8 w-full max-w-5xl mx-auto">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold">My Project</h1>
           <button
