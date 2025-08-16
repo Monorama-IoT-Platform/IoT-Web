@@ -2,7 +2,7 @@
 // import { Routes, Route, Navigate } from 'react-router-dom';
 // import LoginPage from '../pages/LoginPage';
 // import ProjectListPage from '../pages/ProjectListPage';
-// import { getAccessToken } from '../utils/tokenStorage'; 
+// import { getAccessToken } from '../utils/tokenStorage';
 
 // const PrivateRoute = ({ children }) => {
 //   const token = getAccessToken();
@@ -40,18 +40,18 @@
 
 // export default AppRouter;
 
-import { Routes, Route, Navigate } from 'react-router-dom';
-import LoginPage from '../pages/LoginPage';
-import ProjectListPage from '../pages/project/ProjectListPage';
-import ProjectDetailPage from '../pages/project/ProjectDetailPage';
-import ProjectCreatePage from '../pages/project/create/ProjectCreatePage';
-import RegisterUserPage from '../pages/RegisterUserPage';
-import MetaDataFormPage from '../pages/metadata/MetaDataFormPage';
+import { Routes, Route, Navigate } from "react-router-dom";
+import LoginPage from "../pages/LoginPage";
+import ProjectListPage from "../pages/project/ProjectListPage";
+import ProjectDetailPage from "../pages/project/ProjectDetailPage";
+import ProjectCreatePage from "../pages/project/create/ProjectCreatePage";
+import RegisterUserPage from "../pages/RegisterUserPage";
+import MetaDataFormPage from "../pages/metadata/MetaDataFormPage";
 
 function AppRouter() {
   return (
     <Routes>
-      <Route path="/auth/login" element={<LoginPage />} />
+      <Route path="/" element={<LoginPage />} />
       <Route path="/auth/register/social" element={<RegisterUserPage />} />
       <Route path="/projects" element={<ProjectListPage />} />
       <Route path="/projects/:projectId" element={<ProjectDetailPage />} />
