@@ -79,5 +79,3 @@ function AppRouter() {
 }
 
 export default AppRouter;
-
-// TODO: 리프레시 토큰로직 회원가입 후 또는 만료
