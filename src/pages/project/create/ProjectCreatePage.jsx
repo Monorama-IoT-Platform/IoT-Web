@@ -1,6 +1,5 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-
 import ProjectTypeSelector from '../../../components/project/create/ProjectTypeSelector';
 import TermsInputGroup from '../../../components/project/create/TermsInputGroup';
 import DataCollectionSection from '../../../components/project/create/DataCollectionSection';
@@ -11,18 +10,19 @@ import { useProjectCreateForm } from './useProjectCreateForm';
 function ProjectCreatePage() {
   const form = useProjectCreateForm();
   const navigate = useNavigate();
+  const today = new Date().toISOString().split('T')[0];
+  const maxDate = "9999-12-31";
 
   const handleRegister = async () => {
     if (!form.validateForm()) {
-      alert('Please fill in all required fields.');
+      alert('Please fill in all required fields correctly.');
       return;
     }
 
-    // 최소 1개 이상 health/air 항목 선택 여부 검사
     const isAnyHealthSelected = form.showHealth && Object.values(form.healthData).some(Boolean);
     const isAnyAirSelected = form.showAir && Object.values(form.airData).some(Boolean);
     if ((form.showHealth && !isAnyHealthSelected) || (form.showAir && !isAnyAirSelected)) {
-      alert('Please select at least one item from Health or Air data section.');
+      alert('Please select at least one data collection item for the chosen project type.');
       return;
     }
 
@@ -105,11 +105,12 @@ function ProjectCreatePage() {
         <section>
           <h2 className="text-2xl font-bold mb-4 text-indigo-700 border-b pb-2 border-indigo-100">Project Information</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
+            <div className="md:col-span-2">
               <label className="block font-semibold mb-1 text-gray-700">Title</label>
               <input
                 type="text"
-                className={`w-full border-2 rounded-lg px-4 py-2 focus:ring-2 transition ${form.errors.title ? 'border-red-400 focus:ring-red-300' : 'border-indigo-200 focus:ring-indigo-400'}`}
+                placeholder="e.g. MyNewProject"
+                className={`w-full border-2 rounded-lg px-4 py-2 focus:ring-2 transition shadow-sm ${form.errors.title ? 'border-red-400 focus:ring-red-300' : 'border-indigo-200 focus:ring-indigo-400'}`}
                 value={form.title}
                 onChange={e => form.setTitle(e.target.value)}
               />
@@ -119,36 +120,45 @@ function ProjectCreatePage() {
               <label className="block font-semibold mb-1 text-gray-700">Participants</label>
               <input
                 type="number"
-                className={`w-full border-2 rounded-lg px-4 py-2 focus:ring-2 transition ${form.errors.participant ? 'border-red-400 focus:ring-red-300' : 'border-indigo-200 focus:ring-indigo-400'}`}
+                className={`w-full border-2 rounded-lg px-4 py-2 focus:ring-2 transition shadow-sm ${form.errors.participant ? 'border-red-400 focus:ring-red-300' : 'border-indigo-200 focus:ring-indigo-400'}`}
                 value={form.participant}
                 onChange={e => form.setParticipant(e.target.value)}
               />
               {form.errors.participant && <p className="text-sm text-red-500 mt-1">{form.errors.participant}</p>}
             </div>
+            {/* ✅ TODO: 달력 UI 개선 및 과거 날짜 차단 */}
             <div>
-              <label className="block font-semibold mb-1 text-gray-700">Start Date</label>
-              <input
-                type="date"
-                className={`w-full border-2 rounded-lg px-4 py-2 focus:ring-2 transition ${form.errors.startDate ? 'border-red-400 focus:ring-red-300' : 'border-indigo-200 focus:ring-indigo-400'}`}
-                value={form.startDate}
-                onChange={e => form.setStartDate(e.target.value)}
-              />
-              {form.errors.startDate && <p className="text-sm text-red-500 mt-1">{form.errors.startDate}</p>}
-            </div>
-            <div>
-              <label className="block font-semibold mb-1 text-gray-700">End Date</label>
-              <input
-                type="date"
-                className={`w-full border-2 rounded-lg px-4 py-2 focus:ring-2 transition ${form.errors.endDate ? 'border-red-400 focus:ring-red-300' : 'border-indigo-200 focus:ring-indigo-400'}`}
-                value={form.endDate}
-                onChange={e => form.setEndDate(e.target.value)}
-              />
-              {form.errors.endDate && <p className="text-sm text-red-500 mt-1">{form.errors.endDate}</p>}
-            </div>
-            <div className="md:col-span-2">
+                <label className="block font-semibold mb-1 text-gray-700">Start Date</label>
+                <input
+                  type="date"
+                  min={today}
+                  max={maxDate} // ✅ 연도 4자리 초과 방지
+                  className={`w-full border-2 rounded-lg px-4 py-2 focus:ring-2 transition shadow-sm ${
+                    form.errors.startDate ? 'border-red-400 focus:ring-red-300' : 'border-indigo-200 focus:ring-indigo-400'
+                  }`}
+                  value={form.startDate}
+                  onChange={e => form.setStartDate(e.target.value)}
+                />
+                {form.errors.startDate && <p className="text-sm text-red-500 mt-1">{form.errors.startDate}</p>}
+              </div>            
+              <div>
+                <label className="block font-semibold mb-1 text-gray-700">End Date</label>
+                <input
+                  type="date"
+                  min={form.startDate || today}
+                  max={maxDate} // ✅ 연도 4자리 초과 방지
+                  className={`w-full border-2 rounded-lg px-4 py-2 focus:ring-2 transition shadow-sm ${
+                    form.errors.endDate ? 'border-red-400 focus:ring-red-300' : 'border-indigo-200 focus:ring-indigo-400'
+                  }`}
+                  value={form.endDate}
+                  onChange={e => form.setEndDate(e.target.value)}
+                />
+                {form.errors.endDate && <p className="text-sm text-red-500 mt-1">{form.errors.endDate}</p>}
+              </div>
+              <div className="md:col-span-2">
               <label className="block font-semibold mb-1 text-gray-700">Description</label>
               <textarea
-                className={`w-full border-2 rounded-lg px-4 py-2 focus:ring-2 transition min-h-[70px] ${form.errors.description ? 'border-red-400 focus:ring-red-300' : 'border-indigo-200 focus:ring-indigo-400'}`}
+                className={`w-full border-2 rounded-lg px-4 py-2 focus:ring-2 transition min-h-[70px] shadow-sm ${form.errors.description ? 'border-red-400 focus:ring-red-300' : 'border-indigo-200 focus:ring-indigo-400'}`}
                 value={form.description}
                 onChange={e => form.setDescription(e.target.value)}
               ></textarea>
