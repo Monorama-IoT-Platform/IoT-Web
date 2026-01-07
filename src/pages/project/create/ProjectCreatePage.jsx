@@ -14,7 +14,15 @@ function ProjectCreatePage() {
 
   const handleRegister = async () => {
     if (!form.validateForm()) {
-      alert('필수 항목을 모두 입력해주세요.');
+      alert('Please fill in all required fields.');
+      return;
+    }
+
+    // 최소 1개 이상 health/air 항목 선택 여부 검사
+    const isAnyHealthSelected = form.showHealth && Object.values(form.healthData).some(Boolean);
+    const isAnyAirSelected = form.showAir && Object.values(form.airData).some(Boolean);
+    if ((form.showHealth && !isAnyHealthSelected) || (form.showAir && !isAnyAirSelected)) {
+      alert('Please select at least one item from Health or Air data section.');
       return;
     }
 
@@ -72,11 +80,11 @@ function ProjectCreatePage() {
     };
 
     try {
-      const res = await axiosInstance.post('/pm/projects', payload);
-      alert('프로젝트가 성공적으로 등록되었습니다!');
-      navigate('/projects'); 
+      await axiosInstance.post('/pm/projects', payload);
+      alert('Project has been successfully registered!');
+      navigate('/projects');
     } catch (error) {
-      alert('프로젝트 등록에 실패했습니다.');
+      alert('Failed to register the project.');
       console.error(error);
     }
   };
@@ -108,7 +116,7 @@ function ProjectCreatePage() {
               {form.errors.title && <p className="text-sm text-red-500 mt-1">{form.errors.title}</p>}
             </div>
             <div>
-              <label className="block font-semibold mb-1 text-gray-700">Participant</label>
+              <label className="block font-semibold mb-1 text-gray-700">Participants</label>
               <input
                 type="number"
                 className={`w-full border-2 rounded-lg px-4 py-2 focus:ring-2 transition ${form.errors.participant ? 'border-red-400 focus:ring-red-300' : 'border-indigo-200 focus:ring-indigo-400'}`}
@@ -150,7 +158,7 @@ function ProjectCreatePage() {
         </section>
 
         <section>
-          <h2 className="text-2xl font-bold mb-4 text-indigo-700 border-b pb-2 border-indigo-100">Agreement to Terms</h2>
+          <h2 className="text-2xl font-bold mb-4 text-indigo-700 border-b pb-2 border-indigo-100">Agreements</h2>
           <TermsInputGroup
             termsOfPolicy={form.termsOfPolicy} setTermsOfPolicy={form.setTermsOfPolicy}
             privacyPolicy={form.privacyPolicy} setPrivacyPolicy={form.setPrivacyPolicy}
@@ -163,7 +171,7 @@ function ProjectCreatePage() {
         </section>
 
         <section>
-          <h2 className="text-2xl font-bold mb-4 text-indigo-700 border-b pb-2 border-indigo-100">Data Collection Item</h2>
+          <h2 className="text-2xl font-bold mb-4 text-indigo-700 border-b pb-2 border-indigo-100">Data Collection</h2>
           <DataCollectionSection
             personalInfo={form.personalInfo} setPersonalInfo={form.setPersonalInfo}
             healthData={form.healthData} setHealthData={form.setHealthData}
@@ -174,13 +182,13 @@ function ProjectCreatePage() {
 
         {form.showAir && (
           <section>
-            <h2 className="text-2xl font-bold mb-4 text-indigo-700 border-b pb-2 border-indigo-100">Air Meta Data</h2>
+            <h2 className="text-2xl font-bold mb-4 text-indigo-700 border-b pb-2 border-indigo-100">Air Metadata</h2>
             <AirMetaDataList
               airMetaDataItems={form.airMetaDataItems}
               updateMetaDataItem={form.updateMetaDataItem}
               addMetaData={form.addMetaData}
               removeMetaData={form.removeMetaData}
-              errors={form.errors} 
+              errors={form.errors}
               showAddButtonOnly={form.airMetaDataItems.length === 0}
             />
           </section>

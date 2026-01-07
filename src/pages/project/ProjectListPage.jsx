@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { saveToken } from '../../utils/tokenStorage';
 import axiosInstance from '../../api/axiosInstance';
 import LogoutButton from '../../components/LogoutButton';
 
@@ -9,12 +8,6 @@ function ProjectListPage() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const accessToken = urlParams.get('accessToken');
-    if (accessToken) {
-      saveToken(accessToken);
-      window.history.replaceState(null, '', '/projects');
-    }
     const fetchProjects = async () => {
       try {
         const res = await axiosInstance.get('/pm/projects');
@@ -25,6 +18,7 @@ function ProjectListPage() {
     };
     fetchProjects();
   }, []);
+
 
   const getTypeLabel = (type) => {
     switch (type) {
@@ -72,7 +66,7 @@ function ProjectListPage() {
                 {new Date(project.startDate).toLocaleDateString()} -{' '}
                 {new Date(project.endDate).toLocaleDateString()}
               </p>
-              <p className="text-sm text-gray-600">Participants: {project.participant || '120'}</p>
+              <p className="text-sm text-gray-600">Participants: {project.participant || '0'}</p>
               <p className="text-sm mt-1">{getTypeLabel(project.projectType)}</p>
               <button
                 onClick={() => navigate(`/projects/${project.projectId}`)}
@@ -89,3 +83,9 @@ function ProjectListPage() {
 }
 
 export default ProjectListPage;
+
+// TODO: 현재날짜 이전으로 플젝 시작 불가하게 막기
+// TODO: 달력 UI 개선
+// TODO: 위경도 픽스
+// TODO: 프로젝트 이름 카멜케이스에서 스페이스로 변경
+// TODO: 프로젝트 인원 몇명인지 보여주게 하기

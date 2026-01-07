@@ -26,7 +26,7 @@ function LogoutButton() {
       console.warn('로그아웃 요청 실패:', error.message);
     } finally {
       clearToken();
-      navigate('/login');
+      navigate('/auth/login');
     }
   };
 

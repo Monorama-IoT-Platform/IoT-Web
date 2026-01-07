@@ -20,7 +20,23 @@ function DataCollectionSection({
       section === 'health' ? healthData :
       airData;
 
-    updateFn({ ...current, [key]: !current[key] });
+    const newValue = !current[key];
+    const updated = { ...current };
+
+    if (key.endsWith('Value') || key.endsWith('Level')) {
+      const pairKey = key.endsWith('Value')
+        ? key.replace('Value', 'Level')
+        : key.replace('Level', 'Value');
+        
+      updated[key] = newValue;
+      if (pairKey in updated) {
+        updated[pairKey] = newValue;
+      }
+    } else {
+      updated[key] = newValue;
+    }
+
+    updateFn(updated);
   };
 
   return (

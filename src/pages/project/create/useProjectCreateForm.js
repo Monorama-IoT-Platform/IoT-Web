@@ -57,6 +57,9 @@ export function useProjectCreateForm() {
   const [airMetaDataItems, setAirMetaDataItems] = useState([]);
   const [errors, setErrors] = useState({});
 
+  const showHealth = projectType === 'HEALTH_DATA' || projectType === 'BOTH';
+  const showAir = projectType === 'AIR_QUALITY' || projectType === 'BOTH';
+
   const addMetaData = () => {
     setAirMetaDataItems(prev => [...prev, { id: uuidv4(), dataName: '', dataType: 'INTEGER' }]);
   };
@@ -85,9 +88,16 @@ export function useProjectCreateForm() {
     if (!description) newErrors.description = '설명을 입력하세요';
     if (!termsOfPolicy) newErrors.termsOfPolicy = '이용약관을 입력하세요';
     if (!privacyPolicy) newErrors.privacyPolicy = '개인정보 처리방침을 입력하세요';
-    if (!healthDataConsent && showHealth) newErrors.healthDataConsent = '헬스 데이터 동의를 입력하세요';
-    if (!airDataConsent && showAir) newErrors.airDataConsent = '공기 데이터 동의를 입력하세요';
     if (!localDataTermsOfService) newErrors.localDataTermsOfService = '위치 정보 약관을 입력하세요';
+    if (showHealth && !healthDataConsent) newErrors.healthDataConsent = '헬스 데이터 동의를 입력하세요';
+    if (showAir && !airDataConsent) newErrors.airDataConsent = '공기 데이터 동의를 입력하세요';
+
+    if (showHealth && !Object.values(healthData).some(Boolean)) {
+      newErrors.healthData = '헬스 데이터 항목을 최소 1개 이상 선택하세요';
+    }
+    if (showAir && !Object.values(airData).some(Boolean)) {
+      newErrors.airData = '공기질 데이터 항목을 최소 1개 이상 선택하세요';
+    }
 
     if (showAir) {
       airMetaDataItems.forEach(item => {
@@ -101,30 +111,25 @@ export function useProjectCreateForm() {
     return Object.keys(newErrors).length === 0;
   };
 
-useEffect(() => {
-  const newErrors = { ...errors };
+  useEffect(() => {
+    const newErrors = { ...errors };
 
-  if (projectType === 'HEALTH_DATA') {
-    setAirMetaDataItems([]);
-    setAirData(prev => ({ ...Object.fromEntries(Object.keys(prev).map(k => [k, false])) }));
-    setAirDataConsent('');
+    if (projectType === 'HEALTH_DATA') {
+      setAirMetaDataItems([]);
+      setAirData(prev => Object.fromEntries(Object.keys(prev).map(k => [k, false])));
+      setAirDataConsent('');
+      delete newErrors.airDataConsent;
+      Object.keys(newErrors).forEach(key => {
+        if (key.startsWith('airMetaDataItems.')) delete newErrors[key];
+      });
+    } else if (projectType === 'AIR_QUALITY') {
+      setHealthData(prev => Object.fromEntries(Object.keys(prev).map(k => [k, false])));
+      setHealthDataConsent('');
+      delete newErrors.healthDataConsent;
+    }
 
-    delete newErrors.airDataConsent;
-    Object.keys(newErrors).forEach(key => {
-      if (key.startsWith('airMetaDataItems.')) delete newErrors[key];
-    });
-  } else if (projectType === 'AIR_QUALITY') {
-    setHealthData(prev => ({ ...Object.fromEntries(Object.keys(prev).map(k => [k, false])) }));
-    setHealthDataConsent('');
-
-    delete newErrors.healthDataConsent;
-  }
-
-  setErrors(newErrors);
-}, [projectType]);
-
-  const showHealth = projectType === 'HEALTH_DATA' || projectType === 'BOTH';
-  const showAir = projectType === 'AIR_QUALITY' || projectType === 'BOTH';
+    setErrors(newErrors);
+  }, [projectType]);
 
   return {
     projectType, setProjectType,
