@@ -5,8 +5,8 @@ export function useProjectCreateForm() {
   const [projectType, setProjectType] = useState('BOTH');
   const [title, setTitle] = useState('');
   const [participant, setParticipant] = useState('');
-  const [startDate, setStartDate] = useState('');
-  const [endDate, setEndDate] = useState('');
+  const [startDate, setStartDateInternal] = useState('');
+  const [endDate, setEndDateInternal] = useState('');
   const [description, setDescription] = useState('');
 
   const [termsOfPolicy, setTermsOfPolicy] = useState('');
@@ -21,37 +21,15 @@ export function useProjectCreateForm() {
   });
 
   const [healthData, setHealthData] = useState({
-    steps: false,
-    heartRate: false,
-    runningSpeed: false,
-    basalEnergyBurned: false,
-    activeEnergyBurned: false,
-    sleepAnalysis: false,
-    oxygenSaturation: false,
-    bloodPressureSystolic: false,
-    bloodPressureDiastolic: false,
-    respiratoryRate: false,
-    bodyTemperature: false,
-    ecgData: false,
-    watchDeviceLatitude: false,
-    watchDeviceLongitude: false
+    steps: false, heartRate: false, runningSpeed: false, basalEnergyBurned: false, activeEnergyBurned: false, 
+    sleepAnalysis: false, oxygenSaturation: false, bloodPressureSystolic: false, bloodPressureDiastolic: false, 
+    respiratoryRate: false, bodyTemperature: false, ecgData: false, watchDeviceLatitude: true, watchDeviceLongitude: true,
   });
 
   const [airData, setAirData] = useState({
-    pm25Value: false,
-    pm25Level: false,
-    pm10Value: false,
-    pm10Level: false,
-    temperature: false,
-    temperatureLevel: false,
-    humidity: false,
-    humidityLevel: false,
-    co2Value: false,
-    co2Level: false,
-    vocValue: false,
-    vocLevel: false,
-    picoDeviceLatitude: false,
-    picoDeviceLongitude: false
+    pm25Value: false, pm25Level: false, pm10Value: false, pm10Level: false, temperature: false, 
+    temperatureLevel: false, humidity: false, humidityLevel: false, co2Value: false, co2Level: false, 
+    vocValue: false, vocLevel: false, picoDeviceLatitude: true, picoDeviceLongitude: true
   });
 
   const [airMetaDataItems, setAirMetaDataItems] = useState([]);
@@ -59,6 +37,18 @@ export function useProjectCreateForm() {
 
   const showHealth = projectType === 'HEALTH_DATA' || projectType === 'BOTH';
   const showAir = projectType === 'AIR_QUALITY' || projectType === 'BOTH';
+
+  const handleDateChange = (value, setter) => {
+    if (!value) {
+      setter("");
+      return;
+    }
+    const year = value.split("-")[0];
+    // 연도가 4자리를 초과하면(5자리 이상) 업데이트를 무시함
+    if (year && year.length <= 4) {
+      setter(value);
+    }
+  };
 
   const addMetaData = () => {
     setAirMetaDataItems(prev => [...prev, { id: uuidv4(), dataName: '', dataType: 'INTEGER' }]);
@@ -81,28 +71,48 @@ export function useProjectCreateForm() {
 
   const validateForm = () => {
     const newErrors = {};
-    if (!title) newErrors.title = '제목을 입력하세요';
-    if (!participant) newErrors.participant = '참여 인원을 입력하세요';
-    if (!startDate) newErrors.startDate = '시작 날짜를 선택하세요';
-    if (!endDate) newErrors.endDate = '종료 날짜를 선택하세요';
-    if (!description) newErrors.description = '설명을 입력하세요';
-    if (!termsOfPolicy) newErrors.termsOfPolicy = '이용약관을 입력하세요';
-    if (!privacyPolicy) newErrors.privacyPolicy = '개인정보 처리방침을 입력하세요';
-    if (!localDataTermsOfService) newErrors.localDataTermsOfService = '위치 정보 약관을 입력하세요';
-    if (showHealth && !healthDataConsent) newErrors.healthDataConsent = '헬스 데이터 동의를 입력하세요';
-    if (showAir && !airDataConsent) newErrors.airDataConsent = '공기 데이터 동의를 입력하세요';
+    const todayStr = new Date().toISOString().split('T')[0];
 
+    // ✅ 모든 메시지를 한국어에서 영어로 변경
+    if (!title) newErrors.title = 'Please enter the project title';
+    if (!participant) newErrors.participant = 'Please enter the number of participants';
+    
+    // Start Date Validation
+    if (!startDate) {
+      newErrors.startDate = 'Please select a start date';
+    } else if (startDate < todayStr) {
+      newErrors.startDate = 'Start date cannot be in the past';
+    }
+
+    // End Date Validation
+    if (!endDate) {
+      newErrors.endDate = 'Please select an end date';
+    } else if (startDate && endDate && startDate > endDate) {
+      newErrors.endDate = 'End date must be after the start date';
+    }
+
+    if (!description) newErrors.description = 'Please enter a project description';
+    if (!termsOfPolicy) newErrors.termsOfPolicy = 'Please enter the Terms of Service';
+    if (!privacyPolicy) newErrors.privacyPolicy = 'Please enter the Privacy Policy';
+    if (!localDataTermsOfService) newErrors.localDataTermsOfService = 'Please enter the Location Data Terms';
+    
+    // Consent Messages
+    if (showHealth && !healthDataConsent) newErrors.healthDataConsent = 'Please enter the Health Data Consent';
+    if (showAir && !airDataConsent) newErrors.airDataConsent = 'Please enter the Air Quality Data Consent';
+
+    // Item Selection Validation
     if (showHealth && !Object.values(healthData).some(Boolean)) {
-      newErrors.healthData = '헬스 데이터 항목을 최소 1개 이상 선택하세요';
+      newErrors.healthData = 'Please select at least one health data item';
     }
     if (showAir && !Object.values(airData).some(Boolean)) {
-      newErrors.airData = '공기질 데이터 항목을 최소 1개 이상 선택하세요';
+      newErrors.airData = 'Please select at least one air quality data item';
     }
 
+    // Metadata Validation
     if (showAir) {
       airMetaDataItems.forEach(item => {
         if (!item.dataName?.trim()) {
-          newErrors[`airMetaDataItems.${item.id}.dataName`] = '데이터 이름을 입력하세요';
+          newErrors[`airMetaDataItems.${item.id}.dataName`] = 'Please enter the data name';
         }
       });
     }
@@ -113,46 +123,24 @@ export function useProjectCreateForm() {
 
   useEffect(() => {
     const newErrors = { ...errors };
-
     if (projectType === 'HEALTH_DATA') {
       setAirMetaDataItems([]);
       setAirData(prev => Object.fromEntries(Object.keys(prev).map(k => [k, false])));
       setAirDataConsent('');
-      delete newErrors.airDataConsent;
-      Object.keys(newErrors).forEach(key => {
-        if (key.startsWith('airMetaDataItems.')) delete newErrors[key];
-      });
     } else if (projectType === 'AIR_QUALITY') {
       setHealthData(prev => Object.fromEntries(Object.keys(prev).map(k => [k, false])));
       setHealthDataConsent('');
-      delete newErrors.healthDataConsent;
     }
-
     setErrors(newErrors);
   }, [projectType]);
 
   return {
-    projectType, setProjectType,
-    title, setTitle,
-    participant, setParticipant,
-    startDate, setStartDate,
-    endDate, setEndDate,
-    description, setDescription,
-    termsOfPolicy, setTermsOfPolicy,
-    privacyPolicy, setPrivacyPolicy,
-    healthDataConsent, setHealthDataConsent,
-    airDataConsent, setAirDataConsent,
-    localDataTermsOfService, setLocalDataTermsOfService,
-    personalInfo, setPersonalInfo,
-    healthData, setHealthData,
-    airData, setAirData,
-    airMetaDataItems, setAirMetaDataItems,
-    updateMetaDataItem,
-    addMetaData,
-    removeMetaData,
-    showHealth,
-    showAir,
-    errors,
-    validateForm
+    projectType, setProjectType, title, setTitle, participant, setParticipant,
+    startDate, setStartDate: (val) => handleDateChange(val, setStartDateInternal), endDate, setEndDate: (val) => handleDateChange(val, setEndDateInternal), description, setDescription,
+    termsOfPolicy, setTermsOfPolicy, privacyPolicy, setPrivacyPolicy,
+    healthDataConsent, setHealthDataConsent, airDataConsent, setAirDataConsent,
+    localDataTermsOfService, setLocalDataTermsOfService, personalInfo, setPersonalInfo,
+    healthData, setHealthData, airData, setAirData, airMetaDataItems, setAirMetaDataItems,
+    updateMetaDataItem, addMetaData, removeMetaData, showHealth, showAir, errors, validateForm
   };
 }
