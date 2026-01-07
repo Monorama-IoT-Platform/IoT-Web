@@ -12,10 +12,8 @@ const PrivateRoute = ({ children }) =>
   getAccessToken() ? children : <Navigate to="/auth/login" replace />;
 const PublicRoute = ({ children }) => {
   const token = getAccessToken();
-  // 현재 경로가 소셜 회원가입 페이지인지 확인
   const isRegisterPage = window.location.pathname === "/auth/register/social";
 
-  // 토큰이 존재하고, 가입 페이지가 아닐 때만 /projects로 리다이렉트
   if (token && !isRegisterPage) {
     return <Navigate to="/projects" replace />;
   }
