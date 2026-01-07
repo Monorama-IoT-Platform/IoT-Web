@@ -19,6 +19,12 @@ function ProjectListPage() {
     fetchProjects();
   }, []);
 
+  const formatTitle = (title) => {
+    return title
+      .replace(/([A-Z])/g, ' $1') // 대문자 앞에 공백 추가
+      .replace(/^./, (str) => str.toUpperCase()) // 첫 글자 대문자
+      .trim();
+  };
 
   const getTypeLabel = (type) => {
     switch (type) {
@@ -40,43 +46,60 @@ function ProjectListPage() {
   };
 
   return (
-    <div className="relative min-h-screen bg-neutral-200 px-4 py-6">
-      {/* 오른쪽 상단 고정 로그아웃 버튼 */}
+    <div className="relative min-h-screen bg-neutral-200 px-4 pt-20 pb-10">
       <LogoutButton />
 
-      <div className="bg-white rounded-2xl shadow-md p-8 w-full max-w-5xl mx-auto">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold">My Project</h1>
+      <div className="bg-white rounded-3xl shadow-xl p-10 w-full max-w-6xl mx-auto min-h-[600px] flex flex-col">
+        
+        <div className="flex justify-between items-end mb-12 border-b-2 border-gray-100 pb-8">
+          <div>
+            <h1 className="text-4xl font-extrabold text-gray-800 tracking-tight">My Projects</h1>
+            <p className="text-gray-500 mt-2 mr-6">Manage your research project collection.</p>
+          </div>
+          
           <button
             onClick={() => navigate('/projects/create')}
-            className="bg-green-300 hover:bg-green-400 text-white font-semibold px-4 py-2 rounded"
+            className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-6 py-3 mb-3 rounded-xl shadow-lg transition-all transform hover:scale-105 whitespace-nowrap"
           >
-            + Create Project
+            + Create New Project
           </button>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {projects.map((project) => (
-            <div
-              key={project.projectId}
-              className="border border-gray-200 rounded-xl p-4 bg-gray-100 hover:shadow-md"
-            >
-              <h2 className="text-xl font-semibold">{project.projectTitle}</h2>
-              <p className="text-sm text-gray-600">
-                {new Date(project.startDate).toLocaleDateString()} -{' '}
-                {new Date(project.endDate).toLocaleDateString()}
-              </p>
-              <p className="text-sm text-gray-600">Participants: {project.participant || '0'}</p>
-              <p className="text-sm mt-1">{getTypeLabel(project.projectType)}</p>
-              <button
-                onClick={() => navigate(`/projects/${project.projectId}`)}
-                className="text-blue-500 text-sm mt-2 underline"
+        {projects.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {projects.map((project) => (
+              <div
+                key={project.projectId}
+                className="group border border-gray-100 rounded-2xl p-6 bg-gray-50 hover:bg-white hover:shadow-2xl transition-all duration-300 border-l-4 border-l-indigo-500"
               >
-                View Details
-              </button>
-            </div>
-          ))}
-        </div>
+                <h2 className="text-2xl font-bold text-gray-800 mb-2 group-hover:text-indigo-600 transition-colors">
+                  {formatTitle(project.projectTitle)}
+                </h2>
+                <div className="space-y-1 mb-4">
+                  <p className="text-sm text-gray-500 flex items-center gap-2">
+                    📅 {new Date(project.startDate).toLocaleDateString()} - {new Date(project.endDate).toLocaleDateString()}
+                  </p>
+                  <p className="text-sm text-gray-600 flex items-center gap-2 font-medium">
+                    👥 Participants: <span className="text-indigo-600">{project.participant || '0'}</span> 명
+                  </p>
+                </div>
+                <div className="pt-4 border-t border-gray-200 flex justify-between items-center">
+                  <p className="text-sm">{getTypeLabel(project.projectType)}</p>
+                  <button
+                    onClick={() => navigate(`/projects/${project.projectId}`)}
+                    className="text-indigo-500 font-bold text-sm hover:underline"
+                  >
+                    View Details →
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="flex-1 flex flex-col items-center justify-center py-20 bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200">
+            <p className="text-gray-400 text-lg font-medium">No projects found. Start by creating a new one!</p>
+          </div>
+        )}
       </div>
     </div>
   );
