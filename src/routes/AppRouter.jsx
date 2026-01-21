@@ -25,54 +25,12 @@ function AppRouter() {
   return (
     <Routes>
       <Route path="/auth/token-redirect" element={<TokenRedirectPage />} />
-      <Route
-        path="/auth/login"
-        element={
-          <PublicRoute>
-            <LoginPage />
-          </PublicRoute>
-        }
-      />
-      <Route
-        path="/auth/register/social"
-        element={
-          <PublicRoute>
-            <RegisterUserPage />
-          </PublicRoute>
-        }
-      />
-      <Route
-        path="/projects"
-        element={
-          <PrivateRoute>
-            <ProjectListPage />
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path="/projects/create"
-        element={
-          <PrivateRoute>
-            <ProjectCreatePage />
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path="/projects/:projectId"
-        element={
-          <PrivateRoute>
-            <ProjectDetailPage />
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path="/metadata/submit/:projectId"
-        element={
-          <PrivateRoute>
-            <MetaDataFormPage />
-          </PrivateRoute>
-        }
-      />
+      <Route path="/auth/login" element={<PublicRoute><LoginPage /></PublicRoute>} />
+      <Route path="/auth/register/social" element={<PublicRoute><RegisterUserPage /></PublicRoute>} />  
+      <Route path="/projects" element={<PrivateRoute><ProjectListPage /></PrivateRoute>} />
+      <Route path="/projects/create" element={<PrivateRoute><ProjectCreatePage /></PrivateRoute>} />  
+      <Route path="/projects/:projectId" element={<PrivateRoute><ProjectDetailPage /></PrivateRoute>} />
+      <Route path="/metadata/submit/:projectId" element={<PrivateRoute><MetaDataFormPage /></PrivateRoute>} />
       <Route path="*" element={<Navigate to="/auth/login" replace />} />
     </Routes>
   );
