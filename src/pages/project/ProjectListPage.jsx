@@ -80,7 +80,13 @@ function ProjectListPage() {
                     📅 {new Date(project.startDate).toLocaleDateString()} - {new Date(project.endDate).toLocaleDateString()}
                   </p>
                   <p className="text-sm text-gray-600 flex items-center gap-2 font-medium">
-                    👥 Participants: <span className="text-indigo-600">{project.participant || '0'}</span> 명
+                  👥 Participants: 
+                  <span className="text-indigo-600 font-bold">
+                    {/* TODO: API 수정 전까지는 더미데이터 '0' 혹은 임의의 값 사용 */}
+                    {project.currentParticipant || '0'} 
+                  </span>
+                  <span className="text-gray-400">/</span>
+                  <span>{project.participant || '0'} 명</span>
                   </p>
                 </div>
                 <div className="pt-4 border-t border-gray-200 flex justify-between items-center">

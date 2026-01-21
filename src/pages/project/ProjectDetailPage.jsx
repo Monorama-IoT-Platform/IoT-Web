@@ -55,14 +55,27 @@ function ProjectDetailPage() {
                 readOnly
               />
             </div>
-            <div>
-              <label className="block font-semibold mb-1 text-gray-700">Participants</label>
-              <input
-                type="number"
-                className="w-full border-2 rounded-lg px-4 py-2 border-indigo-200 bg-gray-100"
-                value={projectData.participant}
-                readOnly
-              />
+            {/* ✅ 모집 인원 정보 (현재 참여자 수 추가) */}
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block font-semibold mb-1 text-gray-700 underline decoration-indigo-200">Current</label>
+                <input
+                  type="text"
+                  className="w-full border-2 rounded-lg px-4 py-2 border-indigo-100 bg-gray-50 text-indigo-700 font-bold"
+                  // ✅ 백엔드 DTO 업데이트 시 projectData.currentParticipant로 자동 연동
+                  value={`${projectData.currentParticipant || 0} 명`}
+                  readOnly
+                />
+              </div>
+              <div>
+                <label className="block font-semibold mb-1 text-gray-700">Max Capacity</label>
+                <input
+                  type="text"
+                  className="w-full border-2 rounded-lg px-4 py-2 border-indigo-200 bg-gray-100"
+                  value={`${projectData.participant} 명`}
+                  readOnly
+                />
+              </div>
             </div>
             <div>
               <label className="block font-semibold mb-1 text-gray-700">Start Date</label>
