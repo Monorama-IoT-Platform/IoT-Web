@@ -4,9 +4,11 @@ import LoginPage from "../pages/LoginPage";
 import ProjectListPage from "../pages/project/ProjectListPage";
 import ProjectDetailPage from "../pages/project/ProjectDetailPage";
 import ProjectCreatePage from "../pages/project/create/ProjectCreatePage";
+import AirProjectSeriesPage from "../pages/AirProjectSeriesPage.jsx";
 import RegisterUserPage from "../pages/RegisterUserPage";
 import MetaDataFormPage from "../pages/metadata/MetaDataFormPage";
 import TokenRedirectPage from "../pages/TokenRedirectPage";
+import { useParams } from "react-router-dom";
 
 const PrivateRoute = ({ children }) =>
   getAccessToken() ? children : <Navigate to="/auth/login" replace />;
@@ -22,6 +24,10 @@ const PublicRoute = ({ children }) => {
 };
 
 function AppRouter() {
+  const SeriesRoute = () => {
+    const { projectId } = useParams();
+    return <AirProjectSeriesPage projectId={Number(projectId)} />;
+  };
   return (
     <Routes>
       <Route path="/auth/token-redirect" element={<TokenRedirectPage />} />
@@ -31,6 +37,7 @@ function AppRouter() {
       <Route path="/projects/create" element={<PrivateRoute><ProjectCreatePage /></PrivateRoute>} />  
       <Route path="/projects/:projectId" element={<PrivateRoute><ProjectDetailPage /></PrivateRoute>} />
       <Route path="/metadata/submit/:projectId" element={<PrivateRoute><MetaDataFormPage /></PrivateRoute>} />
+      <Route path="/projects/:projectId/series" element={<PrivateRoute><SeriesRoute /></PrivateRoute>} />
       <Route path="*" element={<Navigate to="/auth/login" replace />} />
     </Routes>
   );
