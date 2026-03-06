@@ -14,6 +14,33 @@ function formatTimeLabel(ms, stepSec) {
   return d.toLocaleTimeString();
 }
 
+function CustomTick({ x, y, payload, points, stepSec }) {
+  // payload.payload is the full data point we created in processed.points
+  const point = payload && payload.payload ? payload.payload : null;
+  const idx = point && point.__index != null ? point.__index : -1;
+  const timeMs = payload && payload.value ? Number(payload.value) : null;
+  if (timeMs == null) return null;
+
+  const dateStr = new Date(timeMs).toLocaleDateString();
+  const timeStr = new Date(timeMs).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+  // show date label when first tick or when date changes compared to previous point
+  let showDate = false;
+  if (idx <= 0) showDate = true;
+  else if (points && points[idx - 1]) {
+    const prev = new Date(points[idx - 1].time).toDateString();
+    const cur = new Date(points[idx].time).toDateString();
+    showDate = prev !== cur;
+  }
+
+  return (
+    <g transform={`translate(${x}, ${y})`}>
+      <text x={0} y={0} textAnchor="middle" fontSize={12} fill="#333">{timeStr}</text>
+      {showDate && <text x={0} y={14} textAnchor="middle" fontSize={11} fill="#666">{dateStr}</text>}
+    </g>
+  );
+}
+
 function downsample(points, maxPoints = 2000) {
   const n = points.length;
   if (n <= maxPoints) return points;
@@ -67,17 +94,9 @@ export default function AirProjectSeriesPage({ projectId }) {
   const [tempEndMinute, setTempEndMinute] = useState('59');
   
   const [tempUnit, setTempUnit] = useState('HOUR');
-  const [startDateTime, setStartDateTime] = useState(() => {
-    const d = new Date();
-    d.setDate(d.getDate() - 7);
-    d.setHours(0, 0, 0, 0);
-    return d.toISOString().slice(0, 16);
-  });
-  const [endDateTime, setEndDateTime] = useState(() => {
-    const d = new Date();
-    d.setHours(23, 59, 59, 999);
-    return d.toISOString().slice(0, 16);
-  });
+  // start/end are null initially — do not fetch until user clicks Apply
+  const [startDateTime, setStartDateTime] = useState(null);
+  const [endDateTime, setEndDateTime] = useState(null);
   const [unit, setUnit] = useState('HOUR');
 
   const handleApply = () => {
@@ -89,6 +108,7 @@ export default function AirProjectSeriesPage({ projectId }) {
   };
 
   useEffect(() => {
+    if (!startDateTime || !endDateTime) return; // skip initial mount
     let mounted = true;
     setLoading(true);
     setError(null);
@@ -101,7 +121,6 @@ export default function AirProjectSeriesPage({ projectId }) {
         const data = res.data?.data || res.data;
         console.log('Air Project Series Data:', data);
         setData(data);
-        // enabledMetrics와 무관하게, 실제 데이터가 있는 모든 메트릭을 표시
         if (data.points && data.points.length > 0) {
           const metricsKeys = Object.keys(data.points[0].metrics || {});
           const init = {};
@@ -123,8 +142,8 @@ export default function AirProjectSeriesPage({ projectId }) {
   const processed = useMemo(() => {
     if (!data || !data.points) return { points: [], metricKeys: [], stepSec: 60 };
     const pts = downsample(data.points, 2000);
-    const pointsForChart = pts.map(p => {
-      const obj = { time: new Date(p.time).getTime() };
+    const pointsForChart = pts.map((p, idx) => {
+      const obj = { time: new Date(p.time).getTime(), __timeStr: p.time, __index: idx };
       Object.entries(p.metrics || {}).forEach(([k, v]) => {
         obj[k] = v === null || v === undefined ? undefined : v;
       });
@@ -143,9 +162,7 @@ export default function AirProjectSeriesPage({ projectId }) {
     setVisible(prev => ({ ...prev, [key]: !prev[key] }));
   }, []);
 
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div style={{ color: 'red' }}>{error}</div>;
-  if (!data) return null;
+  // Always render the form and chart area. Data will be empty until Apply is clicked.
 
   return (
     <div style={{ width: '100%', padding: 12 }}>
@@ -236,10 +253,9 @@ export default function AirProjectSeriesPage({ projectId }) {
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis
               dataKey="time"
-              tickFormatter={(val) => formatTimeLabel(Number(val), processed.stepSec)}
               type="number"
               domain={["dataMin", "dataMax"]}
-              tick={{ fontSize: 12 }}
+              tick={<CustomTick points={processed.points} stepSec={processed.stepSec} />}
             />
             <YAxis />
             <Tooltip
@@ -264,6 +280,34 @@ export default function AirProjectSeriesPage({ projectId }) {
           </LineChart>
         </ResponsiveContainer>
       </div>
+      <div style={{ marginTop: 16 }}>
+        <h3 style={{ margin: '8px 0' }}>Table (Excel-like)</h3>
+        <div style={processed.points.length > 40 ? { maxHeight: 360, overflowY: 'auto', overflowX: 'auto', border: '1px solid #e6e6e6' } : { overflowX: 'auto', border: '1px solid #e6e6e6' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: processed.metricKeys && processed.metricKeys.length ? Math.max(600, processed.metricKeys.length * 120) + 'px' : '100%' }}>
+            <thead>
+              <tr>
+                <th style={{ position: 'sticky', top: 0, background: '#fafafa', borderBottom: '1px solid #ddd', padding: 8, textAlign: 'left' }}>Time</th>
+                {processed.metricKeys.map(k => (
+                  <th key={k} style={{ position: 'sticky', top: 0, background: '#fafafa', borderBottom: '1px solid #ddd', padding: 8, textAlign: 'right' }}>{k}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {processed.points.map((p, idx) => (
+                <tr key={idx} style={{ borderBottom: '1px solid #f1f1f1' }}>
+                  <td style={{ padding: 8 }}>{p.__timeStr || new Date(p.time).toLocaleString()}</td>
+                  {processed.metricKeys.map(k => (
+                    <td key={k} style={{ padding: 8, textAlign: 'right' }}>{p[k] != null ? String(p[k]) : ''}</td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   );
 }
+
+// TODO: 쿼리문 다시 생각해보기 -> 서버
+// TODO: GUEST 권한일때 api 로 로그인 가능하도록 -> 서버

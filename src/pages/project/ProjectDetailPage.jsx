@@ -10,6 +10,7 @@ function ProjectDetailPage() {
   const { projectId } = useParams();
   const [projectData, setProjectData] = useState(null);
 
+
   useEffect(() => {
     const fetchProject = async () => {
       try {
@@ -21,7 +22,7 @@ function ProjectDetailPage() {
     };
 
     fetchProject();
-  }, [projectId]);
+  }, [projectId, navigate]);
 
   if (!projectData) {
     return <div>로딩 중...</div>;
@@ -58,12 +59,12 @@ function ProjectDetailPage() {
             {/* ✅ 모집 인원 정보 (현재 참여자 수 추가) */}
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block font-semibold mb-1 text-gray-700 underline decoration-indigo-200">Current</label>
+                <label className="block font-semibold mb-1 text-gray-700">Current Participants</label>
                 <input
                   type="text"
-                  className="w-full border-2 rounded-lg px-4 py-2 border-indigo-100 bg-gray-50 text-indigo-700 font-bold"
+                  className="w-full border-2 rounded-lg px-4 py-2 border-indigo-100 bg-gray-50 text-black font-bold"
                   // ✅ 백엔드 DTO 업데이트 시 projectData.currentParticipant로 자동 연동
-                  value={`${projectData.currentParticipant || 0} 명`}
+                  value={`${projectData.currentParticipant || 0}`}
                   readOnly
                 />
               </div>
@@ -72,7 +73,7 @@ function ProjectDetailPage() {
                 <input
                   type="text"
                   className="w-full border-2 rounded-lg px-4 py-2 border-indigo-200 bg-gray-100"
-                  value={`${projectData.participant} 명`}
+                  value={`${projectData.participant || 0}`}
                   readOnly
                 />
               </div>

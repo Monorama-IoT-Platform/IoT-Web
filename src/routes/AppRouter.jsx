@@ -8,6 +8,7 @@ import AirProjectSeriesPage from "../pages/AirProjectSeriesPage.jsx";
 import RegisterUserPage from "../pages/RegisterUserPage";
 import MetaDataFormPage from "../pages/metadata/MetaDataFormPage";
 import TokenRedirectPage from "../pages/TokenRedirectPage";
+import UnauthorizedPage from "../pages/UnauthorizedPage";
 import { useParams } from "react-router-dom";
 
 const PrivateRoute = ({ children }) =>
@@ -38,6 +39,7 @@ function AppRouter() {
       <Route path="/projects/:projectId" element={<PrivateRoute><ProjectDetailPage /></PrivateRoute>} />
       <Route path="/metadata/submit/:projectId" element={<PrivateRoute><MetaDataFormPage /></PrivateRoute>} />
       <Route path="/projects/:projectId/series" element={<PrivateRoute><SeriesRoute /></PrivateRoute>} />
+      <Route path="/unauthorized" element={<UnauthorizedPage />} />
       <Route path="*" element={<Navigate to="/auth/login" replace />} />
     </Routes>
   );

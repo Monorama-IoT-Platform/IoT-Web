@@ -24,7 +24,25 @@ axiosInstance.interceptors.request.use(
 );
 
 axiosInstance.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    // 서버에서 `success` 플래그가 false로 내려오면 에러를 담고 있음
+    if (response.data && response.data.success === false) {
+      const err = response.data.error;
+      // 커스텀 권한 없음 코드 (403 꾸러미로 간주)
+      if (err && String(err.code).startsWith("403")) {
+        console.warn("[axios] 권한 없음 응답 수신, 토큰 삭제 후 /unauthorized로 이동");
+        clearToken();
+        window.location.href = "/unauthorized";
+        // 컴포넌트에서도 예외 처리할 수 있도록 Promise.reject
+        return Promise.reject({
+          response,
+          message: "권한 없음",
+        });
+      }
+    }
+
+    return response;
+  },
   async (error) => {
     const originalRequest = error.config;
 
@@ -56,6 +74,14 @@ axiosInstance.interceptors.response.use(
         return Promise.reject(refreshError);
       }
     }
+
+    // HTTP 상태 코드로 403 계열 에러가 내려오는 경우도 동일하게 처리
+    if (error.response?.status === 403) {
+      console.warn("[axios] HTTP 403 수신, 토큰 삭제 후 /unauthorized로 이동");
+      clearToken();
+      window.location.href = "/unauthorized";
+    }
+
     return Promise.reject(error);
   }
 );

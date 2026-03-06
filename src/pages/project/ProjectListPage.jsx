@@ -1,11 +1,9 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import axiosInstance from '../../api/axiosInstance';
 import LogoutButton from '../../components/LogoutButton';
 
 function ProjectListPage() {
   const [projects, setProjects] = useState([]);
-  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchProjects = async () => {
@@ -80,23 +78,33 @@ function ProjectListPage() {
                     📅 {new Date(project.startDate).toLocaleDateString()} - {new Date(project.endDate).toLocaleDateString()}
                   </p>
                   <p className="text-sm text-gray-600 flex items-center gap-2 font-medium">
-                  👥 Participants: 
-                  <span className="text-indigo-600 font-bold">
-                    {/* TODO: API 수정 전까지는 더미데이터 '0' 혹은 임의의 값 사용 */}
-                    {project.currentParticipant || '0'} 
-                  </span>
-                  <span className="text-gray-400">/</span>
-                  <span>{project.participant || '0'} 명</span>
+                    👥 Participants:
+                    <span className="text-black font-bold">
+                      {/* TODO: API 수정 전까지는 더미데이터 '0' 혹은 임의의 값 사용 */}
+                      {project.currentParticipant || '0'}
+                    </span>
+                    <span className="text-gray-400">/</span>
+                    <span>{project.participant || '0'} 명</span>
+                  </p>
+                  <p className="text-sm text-gray-500 mt-1">
+                    {getTypeLabel(project.projectType)}
                   </p>
                 </div>
-                <div className="pt-4 border-t border-gray-200 flex justify-between items-center">
-                  <p className="text-sm">{getTypeLabel(project.projectType)}</p>
-                  <button
-                    onClick={() => navigate(`/projects/${project.projectId}`)}
-                    className="text-indigo-500 font-bold text-sm hover:underline"
-                  >
-                    View Details →
-                  </button>
+                  <div className="pt-4 border-t border-gray-200 flex justify-between items-center">
+                  <div className="flex items-center gap-4">
+                    <button
+                      onClick={() => navigate(`/projects/${project.projectId}`)}
+                      className="text-indigo-500 font-bold text-sm hover:underline"
+                    >
+                      View Project Details
+                    </button>
+                    <button
+                      onClick={() => navigate(`/projects/${project.projectId}/series`)}
+                      className="text-green-600 font-bold text-sm hover:underline"
+                    >
+                      View Data
+                    </button>
+                  </div>
                 </div>
               </div>
             ))}
@@ -116,5 +124,3 @@ export default ProjectListPage;
 // TODO: 현재날짜 이전으로 플젝 시작 불가하게 막기
 // TODO: 달력 UI 개선
 // TODO: 위경도 픽스
-// TODO: 프로젝트 이름 카멜케이스에서 스페이스로 변경
-// TODO: 프로젝트 인원 몇명인지 보여주게 하기
